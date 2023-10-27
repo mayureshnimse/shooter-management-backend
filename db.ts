@@ -1,3 +1,6 @@
+
+
+
 import mysql from 'mysql2/promise';
 
 async function connectDatabase() {
@@ -18,5 +21,3 @@ async function connectDatabase() {
 }
 
 export { connectDatabase };
-
-
