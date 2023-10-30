@@ -4,6 +4,14 @@
 #   email: String!
 # }
 
+
+
+type User {
+  id: Int!
+  username: String!
+  email: String!
+}
+
 # type Query {
 #   getUser(id: Int!): User
 #   getAllUsers: [User]
