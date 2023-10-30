@@ -1,17 +1,17 @@
-type User {
-  id: Int!
-  username: String!
-  email: String!
-}
+# type User {
+#   id: Int!
+#   username: String!
+#   email: String!
+# }
 
-type Query {
-  getUser(id: Int!): User
-  getAllUsers: [User]
-}
+# type Query {
+#   getUser(id: Int!): User
+#   getAllUsers: [User]
+# }
 
-type Mutation {
-  createUser(username: String!, email: String!): User
-  updateUser(id: Int!, username: String, email: String): User
-  deleteUser(id: Int!): User
-}
+# type Mutation {
+#   createUser(username: String!, email: String!): User
+#   updateUser(id: Int!, username: String, email: String): User
+#   deleteUser(id: Int!): User
+# }
 
