@@ -1,6 +1,3 @@
-
-
-
 //import { ApolloServer } from 'apollo-server';
 
 import { ApolloServer } from '@apollo/server';
@@ -30,4 +27,3 @@ startStandaloneServer(server, {
 }).then(({ url }) => {
   console.log(`Server ready at ${url}`);
 });;
-///-----

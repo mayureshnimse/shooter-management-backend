@@ -1,3 +1,29 @@
+// database connection
+
+//db.ts
+
+import mysql from 'mysql2/promise';
+
+async function connectDatabase() {
+  try {
+    const connection = await mysql.createConnection({
+      host: 'localhost',
+      user: 'root',
+      password: 'root',
+      database: 'super_db',
+    });
+
+    console.log('Database connected successfully');
+    return connection;
+  } catch (error:any) {
+    console.error('Error connecting to the database:', error.message);
+    throw error;
+  }
+}
+
+export { connectDatabase };
+
+------------------------------------------------------
 // resolvers.ts
 import { connectDatabase } from '../DB/db';
 
@@ -7,7 +33,7 @@ enum TenantType {
   ALL = 'ALL',
 }
 
-interface Tenant {
+interface User {
   id: number;
   tenant_type: TenantType; // Use the TenantType enum
   state: string,
@@ -32,20 +58,20 @@ interface Tenant {
 
 const resolvers = {
   Query: {
-    getTenant: async (_: any, { id }: { id: number }): Promise<Tenant> => {
+    getUser: async (_: any, { id }: { id: number }): Promise<User> => {
       const db = await connectDatabase();
-      const [user]: any[] = await db.query('SELECT * FROM tenants WHERE id = ?', [id]);
+      const [user]: any[] = await db.query('SELECT * FROM users WHERE id = ?', [id]);
       return user[0];
     },
 
-    getTenantByType: async (_: any, { tenant_type }: { tenant_type: TenantType }): Promise<Tenant> => {
+      getUserbyType: async (_: any, { tenant_type }: { tenant_type: TenantType }): Promise<User> => {
         const db = await connectDatabase();
         const [user]: any[] = await db.query('SELECT * FROM tenants WHERE tenant_type = ?', [tenant_type]);
         return user;
       },
     
 
-      getAllTenants: async (): Promise<Tenant[]> => {
+    getAllUsers: async (): Promise<User[]> => {
       const db = await connectDatabase();
       const [users]: any[] = await db.query('SELECT * FROM tenants');
       return users;
@@ -54,7 +80,7 @@ const resolvers = {
 
   
   Mutation: {
-    createTenant: async (_: any, {
+    createUser: async (_: any, {
       tenant_type,
       state,
       tenant_name,
@@ -94,7 +120,7 @@ const resolvers = {
     contract_details: string,
     documents: string,
      
-    }): Promise<Tenant> => {
+    }): Promise<User> => {
       const db = await connectDatabase();
       const [result]: any[] = await db.query('INSERT INTO tenants (tenant_type, state, tenant_name, primary_email, alternate_email, contact_person, primary_contact, alternate_contact, address1, address2, address3, city, pincode, contract_status, contract_startdate, contract_enddate, contract_details, documents) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [tenant_type, state, tenant_name, primary_email, alternate_email, contact_person, primary_contact, alternate_contact, address1, address2, address3, city, pincode, contract_status, contract_startdate, contract_enddate, contract_details, documents]);
       return {
@@ -122,7 +148,7 @@ const resolvers = {
     },
 
 
-    updateTenant: async (_: any, { 
+    updateUser: async (_: any, { 
       id, 
       tenant_type,
       state,
@@ -141,7 +167,7 @@ const resolvers = {
       contract_startdate,
       contract_enddate,
       contract_details,
-      documents, }: Tenant): Promise<Tenant> => {
+      documents, }: User): Promise<User> => {
       const db = await connectDatabase();
       await db.query('UPDATE tenants SET tenant_type=?, state=?, tenant_name=?, primary_email=?, alternate_email=?, contact_person=?, primary_contact=?, alternate_contact=?, address1=?, address2=?, address3=?, city=?, pincode=?, contract_status=?, contract_startdate=?, contract_enddate=?, contract_details=?, documents=?  WHERE id = ?', [
         tenant_type,
@@ -184,7 +210,7 @@ const resolvers = {
         contract_details,
         documents, };
     },
-    deleteTenant: async (_: any, { id }: { id: number }): Promise<Tenant> => {
+    deleteUser: async (_: any, { id }: { id: number }): Promise<User> => {
       const db = await connectDatabase();
       const [user]: any[] = await db.query('DELETE FROM tenants WHERE id = ?', [id]);
       return user[0];
@@ -193,3 +219,152 @@ const resolvers = {
 };
 
 export default resolvers;
+
+
+---------------------------------------------------
+//typeDefs.ts
+
+import gql from '@apollo/server';
+
+const typeDefs = `
+scalar Date
+
+enum TenantType {
+  STATE
+  CLUB
+  ALL
+}
+
+type User {
+  id: Int!
+  tenant_type: TenantType!
+  state: String!
+  tenant_name: String!
+  primary_email: String!
+  alternate_email: String
+  contact_person: String!
+  primary_contact: String!
+  alternate_contact: String
+  address1: String!
+  address2: String
+  address3: String
+  city: String!
+  pincode: String!
+  contract_status: Boolean!
+  contract_startdate: Date!
+  contract_enddate: Date!
+  contract_details: String!
+  documents: String!
+}
+
+type Query {
+  getUser(id: Int!): User
+  getAllUsers: [User]
+  getUserbyType(tenant_type: TenantType!): [User]
+}
+
+type Mutation {
+  createUser(
+    tenant_type: TenantType!
+    state: String!
+  tenant_name: String!
+  primary_email: String!
+  alternate_email: String
+  contact_person: String!
+  primary_contact: String!
+  alternate_contact: String
+  address1: String!
+  address2: String
+  address3: String
+  city: String!
+  pincode: String!
+  contract_status: Boolean!
+  contract_startdate: Date!
+  contract_enddate: Date!
+  contract_details: String!
+  documents: String!
+    ): User
+
+  updateUser(
+    id: Int!
+    tenant_type: TenantType!
+  state: String!
+  tenant_name: String!
+  primary_email: String!
+  alternate_email: String
+  contact_person: String!
+  primary_contact: String!
+  alternate_contact: String
+  address1: String!
+  address2: String
+  address3: String
+  city: String!
+  pincode: String!
+  contract_status: Boolean!
+  contract_startdate: Date!
+  contract_enddate: Date!
+  contract_details: String!
+  documents: String!
+    ): User
+
+  deleteUser(id: Int!): User
+}
+`;
+
+export default typeDefs;
+
+-------------------------------------------------------------
+// server.ts
+
+//import { ApolloServer } from 'apollo-server';
+
+import { ApolloServer } from '@apollo/server';
+import resolvers from './graphql/resolvers';
+import { readFileSync } from 'fs';
+import path from 'path';
+import { startStandaloneServer } from '@apollo/server/standalone';
+import typeDefs from './graphql/typeDefs';
+//const typeDefs = readFileSync(path.join(__dirname, 'schema.graphql'), 'utf-8');
+
+const server = new ApolloServer({ typeDefs, resolvers });
+
+// server.listen().then(({ url }) => {
+//   console.log(`Server ready at ${url}`);
+// });
+
+
+startStandaloneServer(server, {
+  context: async () => {
+     const { cache } = server;
+    return {
+      // We create new instances of our data sources with each request,
+      // passing in our server's cache.
+   
+    };
+  },
+}).then(({ url }) => {
+  console.log(`Server ready at ${url}`);
+});;
+--------------------------------------------------------
+
+CREATE TABLE tenants (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  tenant_type ENUM ('STATE','CLUB','ALL') NOT NULL,
+  state VARCHAR(255) NOT NULL,
+  tenant_name VARCHAR(255) NOT NULL,
+  primary_email VARCHAR(255) NOT NULL,
+  alternate_email VARCHAR(255),
+  contact_person VARCHAR(255) NOT NULL,
+  primary_contact VARCHAR(255) NOT NULL,
+  alternate_contact VARCHAR(255),
+address1 VARCHAR(255) NOT NULL,
+address2 VARCHAR(255),
+address3 VARCHAR(255),
+city VARCHAR(255) NOT NULL,
+pincode VARCHAR(255) NOT NULL,
+  contract_status BOOLEAN NOT NULL,
+contract_startdate DATE NOT NULL,
+contract_enddate DATE NOT NULL,
+contract_details VARCHAR(255) NOT NULL,
+documents VARCHAR(255) NOT NULL
+);

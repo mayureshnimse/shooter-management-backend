@@ -1,62 +1,89 @@
-
-
+//typeDefs.ts
 
 import gql from '@apollo/server';
 
 const typeDefs = `
 scalar Date
 
-type User {
+enum TenantType {
+  STATE
+  CLUB
+  ALL
+}
+
+type Tenant {
   id: Int!
-  name: String!
-  email: [String!]
-  contact: [String!]
+  tenant_type: TenantType!
   state: String!
-  address: String!
+  tenant_name: String!
+  primary_email: String!
+  alternate_email: String
+  contact_person: String!
+  primary_contact: String!
+  alternate_contact: String
+  address1: String!
+  address2: String
+  address3: String
+  city: String!
+  pincode: String!
+  contract_status: Boolean!
   contract_startdate: Date!
   contract_enddate: Date!
-  contract_duration: String!
-  bill_generation: String!
-  createdAt: Date!
-  updatedAt: Date!
+  contract_details: String!
+  documents: String!
 }
 
 type Query {
-  getUser(id: Int!): User
-  getAllUsers: [User]
+  getTenant(id: Int!): Tenant
+  getAllTenants: [Tenant]
+  getTenantByType(tenant_type: TenantType!): [Tenant]
 }
 
 type Mutation {
-  createUser(
-    name: String!,
-    email: [String!],
-    contact: [String!],
-    state: String!,
-    address: String!,
-    contract_startdate: Date!,
-    contract_enddate: Date!,
-    contract_duration: String!,
-    bill_generation: String!,
-    createdAt: Date!,
-    updatedAt: Date!
-    ): User
+  createTenant(
+    tenant_type: TenantType!
+    state: String!
+  tenant_name: String!
+  primary_email: String!
+  alternate_email: String
+  contact_person: String!
+  primary_contact: String!
+  alternate_contact: String
+  address1: String!
+  address2: String
+  address3: String
+  city: String!
+  pincode: String!
+  contract_status: Boolean!
+  contract_startdate: Date!
+  contract_enddate: Date!
+  contract_details: String!
+  documents: String!
+    ): Tenant
 
-  updateUser(
-    id: Int!, 
-    name: String!,
-    email: [String!],
-    contact: [String!],
-    state: String!,
-    address: String!,
-    contract_startdate: Date!,
-    contract_enddate: Date!,
-    contract_duration: String!,
-    bill_generation: String!,
-    createdAt: Date!,
-    updatedAt: Date!
-    ): User
+  updateTenant(
+    id: Int!
+    tenant_type: TenantType!
+  state: String!
+  tenant_name: String!
+  primary_email: String!
+  alternate_email: String
+  contact_person: String!
+  primary_contact: String!
+  alternate_contact: String
+  address1: String!
+  address2: String
+  address3: String
+  city: String!
+  pincode: String!
+  contract_status: Boolean!
+  contract_startdate: Date!
+  contract_enddate: Date!
+  contract_details: String!
+  documents: String!
+    ): Tenant
 
-  deleteUser(id: Int!): User
+  deleteTenant(id: Int!): Tenant
 }
 `;
 
